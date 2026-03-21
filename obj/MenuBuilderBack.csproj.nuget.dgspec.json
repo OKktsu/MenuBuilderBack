@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {}
+    "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {
+    "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
+        "projectUniqueName": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
         "projectName": "MenuBuilderBack",
-        "projectPath": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
+        "projectPath": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
         "packagesPath": "C:\\Users\\Marcelo Luan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\obj\\",
+        "outputPath": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -44,19 +44,27 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.100"
+        "SdkAnalysisLevel": "10.0.200"
       },
       "frameworks": {
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
-            "Microsoft.AspNetCore.OpenApi": {
+            "BCrypt.Net-Next": {
               "target": "Package",
-              "version": "[10.0.3, )"
+              "version": "[4.1.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[10.0.5, )"
+            },
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[10.0.5, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[10.0.0, )"
+              "version": "[10.0.5, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
@@ -72,11 +80,15 @@
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
-              "version": "[10.0.*, )"
+              "version": "[10.0.1, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[10.1.5, )"
+              "version": "[6.9.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.16.0, )"
             }
           },
           "imports": [
@@ -98,7 +110,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.200/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
