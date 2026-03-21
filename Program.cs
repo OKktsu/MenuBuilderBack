@@ -86,24 +86,23 @@ builder.Services.AddAuthentication(x => {
 
 var app = builder.Build();
 
-// 2. Use a política (deve vir antes de UseAuthentication e UseAuthorization)
-app.UseCors("AngularPolicy");
+// --- AJUSTE 1: CORS DINÂMICO ---
+app.UseCors(policy => 
+    policy.WithOrigins("http://localhost:4200", "https://menu-builder-front.vercel.app") // Adicione sua URL de produção aqui
+          .AllowAnyMethod()
+          .AllowAnyHeader());
 
-// 3. Ativar Swagger
-if (app.Environment.IsDevelopment())
+// --- AJUSTE 2: SWAGGER EM PRODUÇÃO ---
+// Removi o 'if IsDevelopment' para que o Swagger funcione no Azure
+app.UseSwagger();
+app.UseSwaggerUI(c => 
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => 
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MenuBuilder API V1");
-        c.RoutePrefix = string.Empty;
-    });
-}
-
-
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MenuBuilder API V1");
+    c.RoutePrefix = string.Empty; // Swagger abre direto na URL principal
+});
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Essencial para Identity
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
