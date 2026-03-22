@@ -4,107 +4,123 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi;
-using Microsoft.OpenApi.Models; // adicione esse também
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configurar Conexão com Supabase (PostgreSQL)
-var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(connectionString));
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+try 
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MenuBuilder API", Version = "v1" });
+    // --- LOGS DE DEBUG PARA O AZURE (Aparecerão no Fluxo de Log) ---
+    Console.WriteLine("[STARTUP] Iniciando carregamento de configurações...");
 
-    var securityScheme = new OpenApiSecurityScheme
+    // 1. Configurar Conexão com Supabase (PostgreSQL)
+    // No Azure, use a variável: ConnectionStrings__SupabaseConnection
+    var connectionString = builder.Configuration["ConnectionStrings:SupabaseConnection"];
+    
+    if (string.IsNullOrEmpty(connectionString))
     {
-        Name = "JWT Authentication",
-        Description = "Digite seu token JWT: **Bearer {seu_token}**",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT"
-    };
+        Console.WriteLine("[ERRO] Connection String 'SupabaseConnection' não encontrada!");
+        throw new Exception("Configuração de Banco de Dados ausente no Azure.");
+    }
 
-    c.AddSecurityDefinition("Bearer", securityScheme);
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(connectionString));
 
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    // 2. Configurar JWT com Verificação de Segurança
+    var jwtSection = builder.Configuration.GetSection("JwtSettings");
+    var jwtSettings = jwtSection.Get<JwtSettings>();
+
+    if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
     {
-        {
-            new OpenApiSecurityScheme
+        Console.WriteLine("[ERRO] Seção 'JwtSettings' ou 'SecretKey' não encontrada!");
+        throw new Exception("Configuração de JWT ausente no Azure.");
+    }
+
+    // Tenta converter a chave Base64 (Isso causa Erro 500 se a chave estiver mal formatada no Azure)
+    byte[] key;
+    try {
+        key = Convert.FromBase64String(jwtSettings.SecretKey);
+    } catch (Exception ex) {
+        Console.WriteLine($"[ERRO] A SecretKey no Azure não é um Base64 válido: {ex.Message}");
+        throw;
+    }
+
+    builder.Services.Configure<JwtSettings>(jwtSection);
+
+    builder.Services.AddAuthentication(x => {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x => {
+        x.TokenValidationParameters = new TokenValidationParameters {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
+
+    // --- RESTANTE DOS SERVIÇOS ---
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "MenuBuilder API", Version = "v1" });
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Digite seu token JWT: **Bearer {seu_token}**"
+        });
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement {
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
-        }
+                new OpenApiSecurityScheme {
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                },
+                Array.Empty<string>()
+            }
+        });
     });
-});
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AngularPolicy", policy =>
-    {
-        policy.WithOrigins("http://localhost:4200") // URL do seu Angular
+    builder.Services.AddIdentity<User, IdentityRole>(options => {
+        options.Password.RequireDigit = false;
+        options.Password.RequiredLength = 6;
+    })
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
+    var app = builder.Build();
+
+    // --- MIDDLEWARES E PIPELINE ---
+    
+    // Swagger visível em Produção (Azure) para facilitar seu teste
+    app.UseSwagger();
+    app.UseSwaggerUI(c => {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MenuBuilder API V1");
+        c.RoutePrefix = string.Empty; 
+    });
+
+    app.UseCors(policy => 
+        policy.WithOrigins("http://localhost:4200", "https://menu-builder-front.vercel.app")
               .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+              .AllowAnyHeader());
 
-builder.Services.AddIdentity<User, IdentityRole>(options => {
-    options.Password.RequireDigit = false; // Exemplo de configuração
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+    app.UseHttpsRedirection();
+    app.UseAuthentication(); 
+    app.UseAuthorization();
+    app.MapControllers();
 
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// 2. Para usar a chave AGORA na configuração do JWT Bearer:
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-var key = Convert.FromBase64String(jwtSettings!.SecretKey);
-
-builder.Services.AddAuthentication(x => {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(x => {
-    x.TokenValidationParameters = new TokenValidationParameters {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false
-    };
-});
-
-var app = builder.Build();
-
-// --- AJUSTE 1: CORS DINÂMICO ---
-app.UseCors(policy => 
-    policy.WithOrigins("http://localhost:4200", "https://menu-builder-front.vercel.app") // Adicione sua URL de produção aqui
-          .AllowAnyMethod()
-          .AllowAnyHeader());
-
-// --- AJUSTE 2: SWAGGER EM PRODUÇÃO ---
-// Removi o 'if IsDevelopment' para que o Swagger funcione no Azure
-app.UseSwagger();
-app.UseSwaggerUI(c => 
+    Console.WriteLine("[STARTUP] Aplicação configurada com sucesso. Rodando...");
+    app.Run();
+}
+catch (Exception ex)
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MenuBuilder API V1");
-    c.RoutePrefix = string.Empty; // Swagger abre direto na URL principal
-});
-
-app.UseHttpsRedirection();
-app.UseAuthentication(); 
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+    Console.WriteLine("====================================================");
+    Console.WriteLine("CRITICAL ERROR DURING APPLICATION STARTUP:");
+    Console.WriteLine(ex.Message);
+    Console.WriteLine(ex.StackTrace);
+    Console.WriteLine("====================================================");
+    throw; // Garante que o Azure registre a falha
+}
