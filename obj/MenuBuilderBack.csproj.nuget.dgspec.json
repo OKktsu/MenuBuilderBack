@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {}
+    "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {}
   },
   "projects": {
-    "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {
+    "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
+        "projectUniqueName": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
         "projectName": "MenuBuilderBack",
-        "projectPath": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
+        "projectPath": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
         "packagesPath": "C:\\Users\\Marcelo Luan\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\obj\\",
+        "outputPath": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
