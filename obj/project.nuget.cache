@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "a8Lx5cji00g=",
+  "dgSpecHash": "i0N1C0w8FRY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
+  "projectFilePath": "c:\\Users\\Marcelo Luan\\source\\MenuBuilder\\Back\\MenuBuilderBack\\MenuBuilderBack.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Marcelo Luan\\.nuget\\packages\\bcrypt.net-next\\4.1.0\\bcrypt.net-next.4.1.0.nupkg.sha512",
     "C:\\Users\\Marcelo Luan\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
