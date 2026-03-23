@@ -23,6 +23,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+
+      - name: Localizar Arquivos de Projeto
+        run: Get-ChildItem -Recurse -Filter *.csproj | Select-Object FullName
+
       - name: dotnet publish
         # Ajustei o output para ./publish (pasta local no runner)
         run: dotnet publish MenuBuilderBack/MenuBuilderBack.csproj -c Release -r win-x64 --self-contained true -o ./publish
