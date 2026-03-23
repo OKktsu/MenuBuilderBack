@@ -24,12 +24,9 @@ jobs:
         run: dotnet restore
 
 
-      - name: Localizar Arquivos de Projeto
-        run: Get-ChildItem -Recurse -Filter *.csproj | Select-Object FullName
-
       - name: dotnet publish
-        # Ajustei o output para ./publish (pasta local no runner)
-        run: dotnet publish MenuBuilderBack/MenuBuilderBack.csproj -c Release -r win-x64 --self-contained true -o ./publish
+        # Removido o "MenuBuilderBack/" do início do caminho
+        run: dotnet publish MenuBuilderBack.csproj -c Release -r win-x64 --self-contained true -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
