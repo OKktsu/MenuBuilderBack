@@ -26,7 +26,7 @@ jobs:
 
       - name: dotnet publish
         # Removido o "MenuBuilderBack/" do início do caminho
-        run: dotnet publish MenuBuilderBack.csproj -c Release -r win-x64 --self-contained true -o ./publish
+        run: dotnet publish MenuBuilderBack.csproj -c Release -r win-x86 --self-contained true -o ./publish
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
