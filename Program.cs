@@ -15,7 +15,7 @@ try
 
     // 1. Configurar Conexão com Supabase (PostgreSQL)
     // No Azure, use a variável: ConnectionStrings__SupabaseConnection
-    var connectionString = builder.Configuration["ConnectionStrings:SupabaseConnection"];
+    var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");    
     
     if (string.IsNullOrEmpty(connectionString))
     {
