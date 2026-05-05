@@ -17,6 +17,9 @@ namespace MenuBuilderBack.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<MenuItemOverride> MenuItemOverrides { get; set; }
+        public DbSet<SessaoMesa> SessoesMesa { get; set; }
+        public DbSet<Pedido> Pedidos { get; set; }
+        public DbSet<PedidoItem> PedidoItens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -144,6 +147,43 @@ namespace MenuBuilderBack.Data
 
             modelBuilder.Entity<MenuItemOverride>()
                 .Property(o => o.Price)
+                .HasColumnType("decimal(10,2)");
+
+            // ── SessaoMesa ──────────────────────────────────────────────────
+            modelBuilder.Entity<SessaoMesa>()
+                .HasIndex(s => s.Token)
+                .IsUnique();
+
+            modelBuilder.Entity<SessaoMesa>()
+                .Property(s => s.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<SessaoMesa>()
+                .HasOne(s => s.Empresa)
+                .WithMany()
+                .HasForeignKey(s => s.EmpresaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SessaoMesa>()
+                .HasMany(s => s.Pedidos)
+                .WithOne(p => p.SessaoMesa)
+                .HasForeignKey(p => p.SessaoMesaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ── Pedido ──────────────────────────────────────────────────────
+            modelBuilder.Entity<Pedido>()
+                .Property(p => p.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Pedido>()
+                .HasMany(p => p.Itens)
+                .WithOne(i => i.Pedido)
+                .HasForeignKey(i => i.PedidoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ── PedidoItem ──────────────────────────────────────────────────
+            modelBuilder.Entity<PedidoItem>()
+                .Property(i => i.PrecoUnitario)
                 .HasColumnType("decimal(10,2)");
         }
     }
