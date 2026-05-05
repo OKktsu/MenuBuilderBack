@@ -1,4 +1,25 @@
-appsettings.Development.json
+# Build outputs
 bin/
 obj/
+
+# User-specific files
+*.user
+*.suo
 .vs/
+
+# Secrets e configurações locais
+appsettings.Development.json
+appsettings.Local.json
+
+# Publicação
+publish/
+*.pubxml
+*.pubxml.user
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
