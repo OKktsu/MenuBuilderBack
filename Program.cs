@@ -25,7 +25,11 @@ var port = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrEmpty(port))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");
+// Aceita tanto a convenção do .NET (ConnectionStrings__SupabaseConnection)
+// quanto uma variável plana (SUPABASE_CONNECTION) usada no Railway
+var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection")
+    ?? Environment.GetEnvironmentVariable("SUPABASE_CONNECTION");
+
 if (string.IsNullOrEmpty(connectionString))
 {
     logger.LogCritical("Connection string 'SupabaseConnection' não encontrada.");
@@ -55,6 +59,14 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
+// Cloudinary: aceita seção de config ou variáveis planas (CLOUDINARY_*)
+var cloudinarySection = builder.Configuration.GetSection("CloudinarySettings");
+if (!cloudinarySection.Exists() || string.IsNullOrEmpty(cloudinarySection["CloudName"]))
+{
+    builder.Configuration["CloudinarySettings:CloudName"]  = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME") ?? "";
+    builder.Configuration["CloudinarySettings:ApiKey"]     = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY")    ?? "";
+    builder.Configuration["CloudinarySettings:ApiSecret"]  = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET") ?? "";
+}
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddScoped<IPhotoService, PhotoService>();
 
@@ -65,6 +77,17 @@ builder.Services.AddServices();
 
 var jwtSection = builder.Configuration.GetSection("JwtSettings");
 var jwtSettings = jwtSection.Get<JwtSettings>();
+
+// Aceita JWT_SECRET_KEY como alternativa a JwtSettings__SecretKey
+if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
+{
+    var envSecret = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+    if (!string.IsNullOrEmpty(envSecret))
+    {
+        builder.Configuration["JwtSettings:SecretKey"] = envSecret;
+        jwtSettings = new JwtSettings { SecretKey = envSecret };
+    }
+}
 
 if (jwtSettings == null || string.IsNullOrEmpty(jwtSettings.SecretKey))
 {
