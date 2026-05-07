@@ -25,10 +25,18 @@ var port = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrEmpty(port))
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
+// Diagnóstico: lista variáveis de ambiente disponíveis (apenas nomes, sem valores)
+var envVarNames = Environment.GetEnvironmentVariables().Keys
+    .Cast<string>()
+    .OrderBy(k => k)
+    .ToList();
+logger.LogInformation("Variáveis de ambiente disponíveis: {Vars}", string.Join(", ", envVarNames));
+
 // Aceita tanto a convenção do .NET (ConnectionStrings__SupabaseConnection)
 // quanto uma variável plana (SUPABASE_CONNECTION) usada no Railway
 var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection")
     ?? Environment.GetEnvironmentVariable("SUPABASE_CONNECTION");
+
 if (string.IsNullOrEmpty(connectionString))
 {
     logger.LogCritical("Connection string 'SupabaseConnection' não encontrada.");
