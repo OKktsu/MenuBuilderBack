@@ -174,3 +174,6 @@ app.MapControllers();
 
 logger.LogInformation("Aplicação iniciada com sucesso.");
 app.Run();
+
+// Expõe a classe Program para o projeto de testes via WebApplicationFactory
+public partial class Program { }
