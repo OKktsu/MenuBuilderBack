@@ -7,6 +7,14 @@
 		<UserSecretsId>d229e83d-34ad-42e1-879e-a2ee038efd1a</UserSecretsId>
 	</PropertyGroup>
 
+	<!-- Exclui o projeto de testes que reside nesta pasta como subdiretório -->
+	<ItemGroup>
+		<Compile Remove="MenuBuilderBack.Tests\**\*" />
+		<Content Remove="MenuBuilderBack.Tests\**\*" />
+		<EmbeddedResource Remove="MenuBuilderBack.Tests\**\*" />
+		<None Remove="MenuBuilderBack.Tests\**\*" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
 		<PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
