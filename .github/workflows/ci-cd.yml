@@ -2,7 +2,7 @@ name: CI/CD — Test & Deploy
 
 on:
   push:
-    branches: ["main", "feature/**"]
+    branches: ["main", "staging", "feature/**"]
   pull_request:
     branches: ["main"]
 
@@ -39,7 +39,7 @@ jobs:
     name: Deploy → Railway Staging
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/feature/cardapio-publico-cozinha' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
