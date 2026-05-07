@@ -1,0 +1,54 @@
+name: CI/CD — Test & Deploy
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  # ── Job 1: Roda os testes ────────────────────────────────────────────────
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore (projeto principal)
+        run: dotnet restore MenuBuilderBack.csproj
+
+      - name: Restore (testes)
+        run: dotnet restore MenuBuilderBack.Tests/MenuBuilderBack.Tests.csproj
+
+      - name: Build
+        run: dotnet build MenuBuilderBack.Tests/MenuBuilderBack.Tests.csproj --no-restore -c Release
+
+      - name: Test
+        run: dotnet test MenuBuilderBack.Tests/MenuBuilderBack.Tests.csproj --no-build -c Release --verbosity normal
+        # Os testes usam InMemory — não precisam de banco real
+
+  # ── Job 2: Deploy no Railway (apenas na feature branch ou main) ──────────
+  deploy-staging:
+    name: Deploy → Railway Staging
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/feature/cardapio-publico-cozinha' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: railway up --service MenuBuilderBack --detach
