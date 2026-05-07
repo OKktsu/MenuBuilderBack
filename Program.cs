@@ -20,6 +20,11 @@ using System.Threading.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 var logger = LoggerFactory.Create(b => b.AddConsole()).CreateLogger("Startup");
 
+// Railway injeta PORT dinamicamente; em dev usa a porta padrão do launchSettings
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var connectionString = builder.Configuration.GetConnectionString("SupabaseConnection");
 if (string.IsNullOrEmpty(connectionString))
 {
