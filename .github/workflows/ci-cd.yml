@@ -34,7 +34,7 @@ jobs:
         run: dotnet test MenuBuilderBack.Tests/MenuBuilderBack.Tests.csproj --no-build -c Release --verbosity normal
         # Os testes usam InMemory — não precisam de banco real
 
-  # ── Job 2: Deploy no Railway (apenas na feature branch ou main) ──────────
+  # ── Job 2: Deploy no Railway via deploy hook ────────────────────────────
   deploy-staging:
     name: Deploy → Railway Staging
     needs: test
@@ -42,13 +42,5 @@ jobs:
     if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service MenuBuilderBack --detach
+      - name: Trigger Railway Deploy
+        run: curl -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK }}"
