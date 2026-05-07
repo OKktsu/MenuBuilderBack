@@ -1,4 +1,4 @@
-name: CI/CD — Test & Deploy
+name: CI — Build & Test
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
     branches: ["main"]
 
 jobs:
-  # ── Job 1: Roda os testes ────────────────────────────────────────────────
   test:
     name: Build & Test
     runs-on: ubuntu-latest
@@ -32,15 +31,3 @@ jobs:
 
       - name: Test
         run: dotnet test MenuBuilderBack.Tests/MenuBuilderBack.Tests.csproj --no-build -c Release --verbosity normal
-        # Os testes usam InMemory — não precisam de banco real
-
-  # ── Job 2: Deploy no Railway via deploy hook ────────────────────────────
-  deploy-staging:
-    name: Deploy → Railway Staging
-    needs: test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Trigger Railway Deploy
-        run: curl -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK }}"
